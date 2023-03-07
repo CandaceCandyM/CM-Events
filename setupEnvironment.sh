@@ -2,10 +2,11 @@
 
 # Fill out the following values
 # The path of your repo on github. Don't include the whole URL, just the part after github.com/KenzieAcademy-SoftwareEngineering/
-export CAPSTONE_REPO_NAME=ata-capstone-project-bestjavaprogrammer
+export CAPSTONE_REPO_NAME=ata-capstone-project-JoshuaLudig
+export GITHUB_TOKEN='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'
 
 # Fill out the following value with the group name in all lowercase and no spaces or special characters.
-export GITHUB_GROUP_NAME=REPLACE_WITH_YOUR_GROUP_NAME
+export GITHUB_GROUP_NAME=majesticeventplanning
 
 # Step Two - configure your shell to always have these variables.
 # For OSX / Linux
