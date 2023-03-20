@@ -3,11 +3,11 @@ package com.kenzie.capstone.service.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kenzie.capstone.service.model.ExampleData;
 
-
 public class LambdaServiceClient {
 
     private static final String GET_EXAMPLE_ENDPOINT = "example/{id}";
     private static final String SET_EXAMPLE_ENDPOINT = "example";
+    private static final String GET_VENUE_EVENTS_ENDPOINT = "venue/{id}/events";
 
     private ObjectMapper mapper;
 
@@ -37,5 +37,18 @@ public class LambdaServiceClient {
             throw new ApiGatewayException("Unable to map deserialize JSON: " + e);
         }
         return exampleData;
+    }
+
+    public String getEvent(String id) {
+        return id;
+    }
+
+    public LambdaServiceClient getVenue(String venueId) {
+        return null;
+    }
+
+    public String getVenueEvents(String id) {
+        EndpointUtility endpointUtility = new EndpointUtility();
+        return endpointUtility.getEndpoint(GET_VENUE_EVENTS_ENDPOINT.replace("{id}", id));
     }
 }
