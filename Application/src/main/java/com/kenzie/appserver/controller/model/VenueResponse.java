@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class VenueResponse {
-    @JsonProperty("venue_id")
+    @JsonProperty("id")
     private String id;
 
-    @JsonProperty("venue_name")
+    @JsonProperty("name")
     private String name;
 
     @JsonProperty("event_capacity")
@@ -16,6 +16,21 @@ public class VenueResponse {
 
     @JsonProperty("status")
     private String status;
+
+    @JsonProperty("address")
+    private String address;
+
+    @JsonProperty("phone")
+    private String phone;
+
+    @JsonProperty("website")
+    private String website;
+
+    @JsonProperty("email")
+    private String email;
+
+    @JsonProperty("description")
+    private String description;
 
     public String getId() {
         return id;
@@ -47,5 +62,45 @@ public class VenueResponse {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

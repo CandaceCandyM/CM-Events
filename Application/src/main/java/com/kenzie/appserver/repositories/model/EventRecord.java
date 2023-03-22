@@ -6,11 +6,12 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 @DynamoDBTable(tableName = "Events")
 public class EventRecord {
+
     private String id;
 
     private String eventName;
 
-    private String address;
+    private String venueId;
 
     private String description;
 
@@ -20,7 +21,7 @@ public class EventRecord {
 
     private String endDate;
 
-    private String status;
+    private String category;
 
     @DynamoDBHashKey(attributeName = "id")
     public String getId() {
@@ -38,15 +39,6 @@ public class EventRecord {
 
     public void setEventName(String eventName) {
         this.eventName = eventName;
-    }
-
-    @DynamoDBAttribute(attributeName = "eventAddress")
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     @DynamoDBAttribute(attributeName = "description")
@@ -86,12 +78,21 @@ public class EventRecord {
         this.username = username;
     }
 
-    @DynamoDBAttribute(attributeName = "eventStatus")
-    public String getStatus() {
-        return status;
+    @DynamoDBAttribute(attributeName = "venueId")
+    public String getVenueId() {
+        return venueId;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setVenueId(String venueId) {
+        this.venueId = venueId;
+    }
+
+    @DynamoDBAttribute(attributeName = "category")
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

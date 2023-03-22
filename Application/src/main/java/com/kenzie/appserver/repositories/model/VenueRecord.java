@@ -16,6 +16,16 @@ public class VenueRecord {
 
     private String status;
 
+    private String address;
+
+    private String phone;
+
+    private String website;
+
+    private String email;
+
+    private String description;
+
     @DynamoDBHashKey(attributeName = "id")
     public String getId() {
         return id;
@@ -50,6 +60,51 @@ public class VenueRecord {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    @DynamoDBAttribute(attributeName = "address")
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    @DynamoDBAttribute(attributeName = "phone")
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    @DynamoDBAttribute(attributeName = "website")
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    @DynamoDBAttribute(attributeName = "email")
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @DynamoDBAttribute(attributeName = "description")
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

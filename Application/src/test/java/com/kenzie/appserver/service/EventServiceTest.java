@@ -1,6 +1,8 @@
 package com.kenzie.appserver.service;
 
-import com.kenzie.appserver.repositories.model.EventRepository;
+import com.kenzie.appserver.repositories.EventRepository;
+import com.kenzie.appserver.repositories.model.EventRecord;
+import com.kenzie.appserver.service.model.Event;
 import com.kenzie.capstone.service.client.LambdaServiceClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -42,16 +45,17 @@ public class EventServiceTest {
     public void getAllEventsByVenue() {
         // GIVEN
         List<Event> events = new ArrayList<>( );
-        Event event1 = new Event("1", "name", "location", "date",
-                "time", "duration", "price", "category", "rating");
-        Event event2 = new Event("2", "name", "location", "date",
-                "time", "duration", "price", "category", "rating");
+        Event event1 = new Event("1", "name", "username", "description",
+                "venueId", "startDate", "endDate", "category");
+        Event event2 = new Event("2", "name", "username", "description",
+                "venueId", "startDate", "endDate", "category");
         events.add(event1);
         events.add(event2);
-        when(eventRepository.findByVenueId("venueId")).thenReturn(events);
+        when(eventRepository.findByVenueId("venueId"))
+                .thenReturn(events.stream().map(this::eventToRecord).collect(Collectors.toList()));
 
         // WHEN
-        List<Event> result = eventService.getAllEventsByVenue("venueId");
+        List<Event> result = eventService.getEventsByVenueId("venueId");
 
         // THEN
         verify(eventRepository).findByVenueId("venueId");
@@ -67,40 +71,18 @@ public class EventServiceTest {
     public void getAllEventsByDate() {
         // GIVEN
         List<Event> events = new ArrayList<>( );
-        Event event1 = new Event("1", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
-        Event event2 = new Event("2", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
+        Event event1 = new Event("1", "name", "username", "description",
+                "venue", "2023-03-20", "2023-05-20", "category");
+        Event event2 = new Event("2", "name", "username", "description",
+                "venue", "2023-03-20", "2023-05-20", "category");
         events.add(event1);
         events.add(event2);
-        when(eventRepository.findByDate("2023-03-20")).thenReturn(events);
+        when(eventRepository.findByStartDateBeforeAndEndDateAfter("2023-04-20", "2023-04-20"))
+                .thenReturn(events.stream().map(this::eventToRecord).collect(Collectors.toList()));
         // WHEN
-        List<Event> result = eventService.getAllEventsByDate(LocalDate.parse("2023-03-20"));
+        List<Event> result = eventService.getEventsByDate("2023-04-20");
         // THEN
-        verify(eventRepository).findByDate("2023-03-20");
-        assertThat(result, containsInAnyOrder(event1, event2));
-    }
-
-    /**
-     * Test to verify that the event service is able to get all events by date range
-     */
-    @Test
-
-    //Test 3
-    public void getAllEventsByDateRange() {
-        // GIVEN
-        List<Event> events = new ArrayList<>( );
-        Event event1 = new Event("1", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
-        Event event2 = new Event("2", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
-        events.add(event1);
-        events.add(event2);
-        when(eventRepository.findByDateBetween(LocalDate.parse("2023-03-20"), LocalDate.parse("2023-03-20"))).thenReturn(events);
-        // WHEN
-        List<Event> result = eventService.getAllEventsByDateRange("2023-03-20", "2023-03-20");
-        // THEN
-        verify(eventRepository).findByDateBetween(LocalDate.parse("2023-03-20"), LocalDate.parse("2023-03-20"));
+        verify(eventRepository).findByStartDateBeforeAndEndDateAfter("2023-04-20", "2023-04-20");
         assertThat(result, containsInAnyOrder(event1, event2));
     }
 
@@ -109,19 +91,20 @@ public class EventServiceTest {
      */
     @Test
 
-    //Test 4
+    //Test 3
     public void getAllEventsByCategory() {
         // GIVEN
         List<Event> events = new ArrayList<>( );
-        Event event1 = new Event("1", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
-        Event event2 = new Event("2", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
+        Event event1 = new Event("1", "name", "username", "description",
+                "venue", "2023-03-20", "2023-05-20", "category");
+        Event event2 = new Event("2", "name", "username", "description",
+                "venue", "2023-03-20", "2023-05-20", "category");
         events.add(event1);
         events.add(event2);
-        when(eventRepository.findByCategory("category")).thenReturn(events);
+        when(eventRepository.findByCategory("category"))
+                .thenReturn(events.stream().map(this::eventToRecord).collect(Collectors.toList()));
         // WHEN
-        List<Event> result = eventService.getAllEventsByCategory("category");
+        List<Event> result = eventService.getEventsByCategory("category");
         // THEN
         verify(eventRepository).findByCategory("category");
         assertThat(result, containsInAnyOrder(event1, event2));
@@ -132,21 +115,22 @@ public class EventServiceTest {
      */
     @Test
 
-    //Test 5
-    public void getAllEventsByPrice() {
+    //Test 4
+    public void getAllEventsByDescription() {
         // GIVEN
         List<Event> events = new ArrayList<>( );
-        Event event1 = new Event("1", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
-        Event event2 = new Event("2", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
+        Event event1 = new Event("1", "name", "username", "description",
+                "venue", "2023-03-20", "2023-05-20", "category");
+        Event event2 = new Event("2", "name", "username", "description",
+                "venue", "2023-03-20", "2023-05-20", "category");
         events.add(event1);
         events.add(event2);
-        when(eventRepository.findByPrice("price")).thenReturn(events);
+        when(eventRepository.findByDescriptionContaining("ript"))
+                .thenReturn(events.stream().map(this::eventToRecord).collect(Collectors.toList()));
         // WHEN
-        List<Event> result = eventService.getAllEventsByPrice("price");
+        List<Event> result = eventService.getEventsByDescription("ript");
         // THEN
-        verify(eventRepository).findByPrice("price");
+        verify(eventRepository).findByDescriptionContaining("ript");
         assertThat(result, containsInAnyOrder(event1, event2));
     }
 
@@ -155,21 +139,22 @@ public class EventServiceTest {
      */
     @Test
 
-    //Test 6
-    public void getAllEventsByRating() {
+    //Test 5
+    public void getAllEventsByUsername() {
         // GIVEN
         List<Event> events = new ArrayList<>( );
-        Event event1 = new Event("1", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
-        Event event2 = new Event("2", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
+        Event event1 = new Event("1", "name", "username", "description",
+                "venue", "2023-03-20", "2023-05-20", "category");
+        Event event2 = new Event("2", "name", "username", "description",
+                "venue", "2023-03-20", "2023-05-20", "category");
         events.add(event1);
         events.add(event2);
-        when(eventRepository.findByRating("rating")).thenReturn(events);
+        when(eventRepository.findByUsername("username"))
+                .thenReturn(events.stream().map(this::eventToRecord).collect(Collectors.toList()));
         // WHEN
-        List<Event> result = eventService.getAllEventsByRating("rating");
+        List<Event> result = eventService.getEventsByUserame("username");
         // THEN
-        verify(eventRepository).findByRating("rating");
+        verify(eventRepository).findByUsername("username");
         assertThat(result, containsInAnyOrder(event1, event2));
     }
 
@@ -178,91 +163,36 @@ public class EventServiceTest {
      */
     @Test
 
-    //Test 7
+    //Test 6
     public void getAllEventsByName() {
         // GIVEN
         List<Event> events = new ArrayList<>( );
-        Event event1 = new Event("1", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
-        Event event2 = new Event("2", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
+        Event event1 = new Event("1", "name", "username", "description",
+                "venue", "2023-03-20", "2023-05-20", "category");
+        Event event2 = new Event("2", "name", "username", "description",
+                "venue", "2023-03-20", "2023-05-20", "category");
         events.add(event1);
         events.add(event2);
-        when(eventRepository.findByName("name")).thenReturn(events);
+        when(eventRepository.findByEventNameContaining("name"))
+                .thenReturn(events.stream().map(this::eventToRecord).collect(Collectors.toList()));
         // WHEN
-        List<Event> result = eventService.getAllEventsByName("name");
+        List<Event> result = eventService.getEventsByName("name");
         // THEN
-        verify(eventRepository).findByName("name");
+        verify(eventRepository).findByEventNameContaining("name");
         assertThat(result, containsInAnyOrder(event1, event2));
     }
 
-    /**
-     * Test to verify that the event service is able to get all events by location
-     */
-    @Test
-
-    //Test 8
-    public void getAllEventsByLocation() {
-        // GIVEN
-        List<Event> events = new ArrayList<>( );
-        Event event1 = new Event("1", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
-        Event event2 = new Event("2", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
-        events.add(event1);
-        events.add(event2);
-        when(eventRepository.findByLocation("location")).thenReturn(events);
-        // WHEN
-        List<Event> result = eventService.getAllEventsByLocation("location");
-        // THEN
-        verify(eventRepository).findByLocation("location");
-        assertThat(result, containsInAnyOrder(event1, event2));
-    }
-
-    /**
-     * Test to verify that the event service is able to get all events by time
-     */
-    @Test
-
-    //Test 9
-    public void getAllEventsByTime() {
-        // GIVEN
-        List<Event> events = new ArrayList<>( );
-        Event event1 = new Event("1", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
-        Event event2 = new Event("2", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
-        events.add(event1);
-        events.add(event2);
-        when(eventRepository.findByTime("time")).thenReturn(events);
-        // WHEN
-        List<Event> result = eventService.getAllEventsByTime("time");
-        // THEN
-        verify(eventRepository).findByTime("time");
-        assertThat(result, containsInAnyOrder(event1, event2));
-    }
-
-    /**
-     * Test to verify that the event service is able to get all events by duration
-     */
-    @Test
-
-    //Test 10
-    public void getAllEventsByDuration() {
-        // GIVEN
-        List<Event> events = new ArrayList<>( );
-        Event event1 = new Event("1", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
-        Event event2 = new Event("2", "name", "location", "2023-03-20",
-                "time", "duration", "price", "category", "rating");
-        events.add(event1);
-        events.add(event2);
-        when(eventRepository.findByDuration("duration")).thenReturn(events);
-        // WHEN
-        List<Event> result = eventService.getAllEventsByDuration("duration");
-        // THEN
-        verify(eventRepository).findByDuration("duration");
-        assertThat(result, containsInAnyOrder(event1, event2));
+    private EventRecord eventToRecord(Event event){
+        EventRecord record = new EventRecord();
+        record.setId(event.getId());
+        record.setEventName(event.getEventName());
+        record.setDescription(event.getDescription());
+        record.setVenueId(event.getVenueId());
+        record.setUsername(event.getUsername());
+        record.setStartDate(event.getStartDate());
+        record.setEndDate(event.getEndDate());
+        record.setCategory(event.getCategory());
+        return record;
     }
 }
 

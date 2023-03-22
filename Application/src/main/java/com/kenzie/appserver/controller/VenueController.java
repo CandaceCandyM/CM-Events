@@ -9,7 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/venues")
@@ -21,10 +24,50 @@ public class VenueController {
         this.venueService = venueService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<VenueResponse> getVenues(@PathVariable("id") String id) {
+    @GetMapping
+    public ResponseEntity<List<VenueResponse>> getVenues(){
+        List<Venue> venues = venueService.getAllVenues();
 
-        Venue venue = venueService.findById(id);
+        if(venues == null || venues.isEmpty()) return ResponseEntity.noContent().build();
+
+        List<VenueResponse> responses = venues.stream().map(this::convertVenue).collect(Collectors.toList());
+
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/open")
+    public ResponseEntity<List<VenueResponse>> getAvailableVenues(){
+        List<Venue> venues = venueService.getAvailableVenues();
+
+        if(venues == null || venues.isEmpty()) return ResponseEntity.noContent().build();
+
+        List<VenueResponse> responses = venues.stream().map(this::convertVenue).collect(Collectors.toList());
+
+        return ResponseEntity.ok(responses);
+    }
+
+    @PostMapping("/{id}")
+    public ResponseEntity<VenueResponse> updateVenue(@PathVariable("id") String venueId,
+                                                     @RequestBody VenueCreateRequest updateRequest) {
+        Venue venue = new Venue(venueId,
+                updateRequest.getName(),
+                updateRequest.getDescription(),
+                updateRequest.getAddress(),
+                updateRequest.getEventCapacity(),
+                updateRequest.getStatus(),
+                updateRequest.getPhone(),
+                updateRequest.getWebsite(),
+                updateRequest.getEmail());
+
+        VenueResponse response = convertVenue(venueService.updateVenue(venue));
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<VenueResponse> getVenueById(@PathVariable("id") String id) {
+
+        Venue venue = venueService.getVenueById(id);
         if (venue == null) {
             return ResponseEntity.notFound().build();
         }
@@ -36,16 +79,22 @@ public class VenueController {
 
     @PostMapping
     public ResponseEntity<VenueResponse> addNewVenue(@RequestBody VenueCreateRequest venueCreateRequest) {
-        Venue venue = venueService.addNewVenue(venueCreateRequest.getName(), venueCreateRequest.getEventCapacity());
+        Venue venue = new Venue(UUID.randomUUID().toString(),
+                venueCreateRequest.getName(),
+                venueCreateRequest.getDescription(),
+                venueCreateRequest.getAddress(),
+                venueCreateRequest.getEventCapacity());
+        if (venueCreateRequest.getStatus() != null)
+            venue.setStatus(venueCreateRequest.getStatus());
 
-        VenueResponse venueResponse = convertVenue(venue);
+        VenueResponse venueResponse = convertVenue(venueService.createVenue(venue));
 
         return ResponseEntity.ok(venueResponse);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<VenueResponse> deleteVenue(@PathVariable("id") String venueId){
-        venueService.deleteVenueById(venueId);
+        venueService.deleteVenue(venueId);
         return ResponseEntity.noContent().build();
     }
 
@@ -53,8 +102,13 @@ public class VenueController {
         VenueResponse venueResponse = new VenueResponse();
         venueResponse.setId(venue.getId());
         venueResponse.setName(venue.getName());
+        venueResponse.setDescription(venue.getDescription());
+        venueResponse.setAddress(venue.getAddress());
         venueResponse.setEventCapacity(venue.getEventCapacity());
         venueResponse.setStatus(venue.getStatus());
+        venueResponse.setPhone(venue.getPhone());
+        venueResponse.setWebsite(venue.getWebsite());
+        venueResponse.setEmail(venue.getEmail());
         return venueResponse;
     }
 

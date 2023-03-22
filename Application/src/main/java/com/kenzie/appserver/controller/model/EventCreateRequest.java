@@ -10,8 +10,12 @@ public class EventCreateRequest {
     private String eventName;
 
     @NotEmpty
-    @JsonProperty("address")
-    private String address;
+    @JsonProperty("username")
+    private String username;
+
+    @NotEmpty
+    @JsonProperty("venue_id")
+    private String venueId;
 
     @NotEmpty
     @JsonProperty("description")
@@ -25,6 +29,10 @@ public class EventCreateRequest {
     @JsonProperty("end_date")
     private String endDate;
 
+    @NotEmpty
+    @JsonProperty("category")
+    private String category;
+
     public String getEventName() {
         return eventName;
     }
@@ -33,12 +41,28 @@ public class EventCreateRequest {
         this.eventName = eventName;
     }
 
-    public String getAddress() {
-        return address;
+    public String getUsername() {
+        return username;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getVenueId() {
+        return venueId;
+    }
+
+    public void setVenueId(String venueId) {
+        this.venueId = venueId;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public String getDescription() {

@@ -4,20 +4,20 @@ import com.kenzie.appserver.controller.model.EventCreateRequest;
 import com.kenzie.appserver.controller.model.EventResponse;
 import com.kenzie.appserver.service.EventService;
 import com.kenzie.appserver.service.model.Event;
+import com.kenzie.appserver.service.model.Guest;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/event")
+@RequestMapping("/events")
 public class EventController {
 
     private final EventService eventService;
@@ -26,8 +26,8 @@ public class EventController {
         this.eventService = eventService;
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<EventResponse>> getEvents(){
+    @GetMapping
+    public ResponseEntity<List<EventResponse>> getEvents() {
         List<Event> events = eventService.getAllEvents();
 
         if(events == null || events.isEmpty()) return ResponseEntity.noContent().build();
@@ -37,8 +37,25 @@ public class EventController {
         return ResponseEntity.ok(responses);
     }
 
+    @PostMapping("/{id}")
+    public ResponseEntity<EventResponse> updateEvent(@PathVariable("id") String eventId,
+                                                     @RequestBody EventCreateRequest updateRequest) {
+        Event event = new Event(eventId,
+                updateRequest.getEventName(),
+                updateRequest.getUsername(),
+                updateRequest.getDescription(),
+                updateRequest.getVenueId(),
+                updateRequest.getStartDate(),
+                updateRequest.getEndDate(),
+                updateRequest.getCategory());
+
+        EventResponse response = convertEvent(eventService.updateEvent(event));
+
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<EventResponse> getEventById(@PathVariable("id") String eventId){
+    public ResponseEntity<EventResponse> getEventById(@PathVariable("id") String eventId) {
         Event event = eventService.getEventById(eventId);
         if (event == null) {
             return ResponseEntity.notFound().build();
@@ -48,20 +65,78 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity<EventResponse> createEvent(@RequestBody EventCreateRequest eventCreateRequest){
-        Event event = new Event(eventCreateRequest.getEventName(), eventCreateRequest.getDescription(),
-                eventCreateRequest.getAddress(), eventCreateRequest.getStartDate(), eventCreateRequest.getEndDate());
+    public ResponseEntity<EventResponse> createEvent(@RequestBody EventCreateRequest eventCreateRequest) {
+        Event event = new Event(UUID.randomUUID().toString(),
+                eventCreateRequest.getEventName(),
+                eventCreateRequest.getUsername(),
+                eventCreateRequest.getDescription(),
+                eventCreateRequest.getVenueId(),
+                eventCreateRequest.getStartDate(),
+                eventCreateRequest.getEndDate(),
+                eventCreateRequest.getCategory());
 
-        eventService.createNewEvent(event);
-
-        EventResponse eventResponse = convertEvent(event);
+        EventResponse eventResponse = convertEvent(eventService.addEvent(event));
 
         return ResponseEntity.created(URI.create("/events/"+eventResponse.getId())).body(eventResponse);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<EventResponse> deleteEvent(@PathVariable("id") String eventId){
+    public ResponseEntity<EventResponse> deleteEvent(@PathVariable("id") String eventId) {
         eventService.deleteEventById(eventId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/guests")
+    public ResponseEntity<List<Guest>> getGuests(@PathVariable("id") String eventId) {
+        eventService.getEventGuests(eventId);
+        return null;
+    }
+
+    @GetMapping("/today")
+    public ResponseEntity<List<EventResponse>> getEventsToday() {
+        return ResponseEntity.ok(eventService.getEventsToday()
+                .stream().map(this::convertEvent).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/date/{date}")
+    public ResponseEntity<List<EventResponse>> getEventsByDate(@PathVariable("date") String date) {
+        return ResponseEntity.ok(eventService.getEventsByDate(date)
+                .stream().map(this::convertEvent).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/venueId/{venueId}")
+    public ResponseEntity<List<EventResponse>> getEventsByVenueId(@PathVariable("venueId") String venueId) {
+        return ResponseEntity.ok(eventService.getEventsByVenueId(venueId)
+                .stream().map(this::convertEvent).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/eventName/{eventName}")
+    public ResponseEntity<List<EventResponse>> getEventsByName(@PathVariable("eventName") String eventName) {
+        return ResponseEntity.ok(eventService.getEventsByName(eventName)
+                .stream().map(this::convertEvent).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/username/{username}")
+    public ResponseEntity<List<EventResponse>> getEventsByUsername(@PathVariable("username") String username) {
+        return ResponseEntity.ok(eventService.getEventsByUserame(username)
+                .stream().map(this::convertEvent).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/category/{category}")
+    public ResponseEntity<List<EventResponse>> getEventsByCategory(@PathVariable("category") String category) {
+        return ResponseEntity.ok(eventService.getEventsByCategory(category)
+                .stream().map(this::convertEvent).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/description/{description}")
+    public ResponseEntity<List<EventResponse>> getEventsByDescription(@PathVariable("description") String description) {
+        return ResponseEntity.ok(eventService.getEventsByDescription(description)
+                .stream().map(this::convertEvent).collect(Collectors.toList()));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<EventResponse> deleteAllEvents() {
+        eventService.deleteAllEvents();
         return ResponseEntity.noContent().build();
     }
 
@@ -71,10 +146,10 @@ public class EventController {
         eventResponse.setUsername(event.getUsername());
         eventResponse.setEventName(event.getEventName());
         eventResponse.setDescription(event.getDescription());
+        eventResponse.setVenueId(event.getVenueId());
         eventResponse.setStartDate(event.getStartDate());
         eventResponse.setEndDate(event.getEndDate());
-        eventResponse.setStatus(event.getStatus());
-        eventResponse.setAddress(event.getAddress());
+        eventResponse.setCategory(event.getCategory());
         return eventResponse;
     }
 

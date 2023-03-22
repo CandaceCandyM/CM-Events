@@ -5,14 +5,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EventResponse {
-    @JsonProperty("event_id")
+    @JsonProperty("id")
     private String id;
 
     @JsonProperty("event_name")
     private String eventName;
 
-    @JsonProperty("address")
-    private String address;
+    @JsonProperty("venue_id")
+    private String venueId;
 
     @JsonProperty("description")
     private String description;
@@ -26,8 +26,8 @@ public class EventResponse {
     @JsonProperty("end_date")
     private String endDate;
 
-    @JsonProperty("event_status")
-    private String status;
+    @JsonProperty("category")
+    private String category;
 
     public String getId() {
         return id;
@@ -45,12 +45,20 @@ public class EventResponse {
         this.eventName = eventName;
     }
 
-    public String getAddress() {
-        return address;
+    public String getVenueId() {
+        return venueId;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setVenueId(String venueId) {
+        this.venueId = venueId;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public String getDescription() {
@@ -83,13 +91,5 @@ public class EventResponse {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 }

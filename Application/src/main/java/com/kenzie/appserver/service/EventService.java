@@ -1,31 +1,45 @@
 package com.kenzie.appserver.service;
-import com.kenzie.appserver.repositories.model.EventRepository;
+import com.kenzie.appserver.repositories.EventRepository;
+import com.kenzie.appserver.repositories.model.EventRecord;
+import com.kenzie.appserver.service.model.Event;
+import com.kenzie.appserver.service.model.Guest;
 import com.kenzie.capstone.service.client.LambdaServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EventService {
 
     private final EventRepository eventRepository;
- @Autowired
+    private final LambdaServiceClient lambdaServiceClient;
+
+    @Autowired
     public EventService(LambdaServiceClient lambdaServiceClient, EventRepository eventRepository) {
         this.eventRepository = eventRepository;
+        this.lambdaServiceClient = lambdaServiceClient;
     }
 
     public Event getEventById(String id) {
-        return eventRepository.findById(id).orElse(null);
+        if (id == null) {
+            throw new NullPointerException("id cannot be null!");
+        }
+        return recordToEvent(eventRepository.findById(id).get());
     }
 
     public Event addEvent(Event event) {
-        return eventRepository.save(event);
+        eventRepository.save(eventToRecord(event));
+        return event;
     }
 
     public Event updateEvent(Event event) {
-        return eventRepository.save(event);
+        eventRepository.save(eventToRecord(event));
+        return event;
     }
 
     public void deleteEventById(String id) {
@@ -33,108 +47,85 @@ public class EventService {
     }
 
     public List<Event> getAllEvents() {
-        return (List<Event>) eventRepository.findAll();
+        Iterable<EventRecord> records = eventRepository.findAll();
+
+        List<Event> events = new ArrayList<>();
+        for (EventRecord record : records) {
+            events.add(recordToEvent(record));
+        }
+
+        if (events.isEmpty())
+            throw new NotFoundException("No events found!");
+        return events;
+    }
+
+    public List<Guest> getEventGuests(String id){
+        lambdaServiceClient.getExampleData(id);
+        //Do something here
+        return null;
     }
 
     public List<Event> getEventsToday() {
         LocalDate today = LocalDate.now();
-        return eventRepository.findByDate(String.valueOf(today));
+        return eventRepository.findByStartDateBeforeAndEndDateAfter(today.toString(), today.toString())
+                .stream().map(this::recordToEvent).collect(Collectors.toList());
     }
 
-    public List<Event> getEventsNextWeek() {
-        LocalDate nextWeek = LocalDate.now().plusWeeks(1);
-        return eventRepository.findByDateBetween(LocalDate.now(), nextWeek);
-    }
-
-    public List<Event> getEventsByDateRange(LocalDate startDate, LocalDate endDate) {
-        return eventRepository.findByDateBetween(startDate, endDate);
+    public List<Event> getEventsByDate(String date) {
+        return eventRepository.findByStartDateBeforeAndEndDateAfter(date, date)
+                .stream().map(this::recordToEvent).collect(Collectors.toList());
     }
 
     public List<Event> getEventsByVenueId(String venueId) {
-        return eventRepository.findByVenueId(venueId);
+        return eventRepository.findByVenueId(venueId)
+                .stream().map(this::recordToEvent).collect(Collectors.toList());
     }
 
     public void deleteAllEvents() {
         eventRepository.deleteAll();
     }
 
-    public List<Event> getEventsByMinimumRating(int minRating) {
-        return eventRepository.findByRatingGreaterThanEqual(minRating);
-    }
-
-    public List<Event> getEventsByPrice(double price) {
-        return eventRepository.findByPrice(String.valueOf(price));
-    }
-
-    public List<Event> getEventsByLocation(String location) {
-        return eventRepository.findByLocation(location);
-    }
-
     public List<Event> getEventsByName(String name) {
-        return eventRepository.findByName(name);
+        return eventRepository.findByEventNameContaining(name)
+                .stream().map(this::recordToEvent).collect(Collectors.toList());
     }
 
-    public List<Event> getEventsByDuration(String duration) {
-        return eventRepository.findByDuration(duration);
+    public List<Event> getEventsByUserame(String name) {
+        return eventRepository.findByUsername(name)
+                .stream().map(this::recordToEvent).collect(Collectors.toList());
     }
 
-    public List<Event> getEventsByTime(String time) {
-        return eventRepository.findByTime(time);
-
-    }
-    public List<Event> getAllEventsByLocation(String location) {
-        return eventRepository.findByLocation(location);
+    public List<Event> getEventsByCategory(String category) {
+        return eventRepository.findByCategory(category)
+                .stream().map(this::recordToEvent).collect(Collectors.toList());
     }
 
-    public List<Event> getAllEventsByName(String name) {
-        return eventRepository.findByName(name);
+    public List<Event> getEventsByDescription(String description) {
+        return eventRepository.findByDescriptionContaining(description)
+                .stream().map(this::recordToEvent).collect(Collectors.toList());
     }
 
-    public List<Event> getAllEventsByRating(int rating, int i) {
-        return eventRepository.findByRating(String.valueOf(rating));
+    private EventRecord eventToRecord(Event event){
+        EventRecord record = new EventRecord();
+        record.setId(event.getId());
+        record.setEventName(event.getEventName());
+        record.setDescription(event.getDescription());
+        record.setVenueId(event.getVenueId());
+        record.setUsername(event.getUsername());
+        record.setStartDate(event.getStartDate());
+        record.setEndDate(event.getEndDate());
+        record.setCategory(event.getCategory());
+        return record;
     }
 
-    public List<List<Event>> getAllEventsByPrice(double price) {
-        return List.of(eventRepository.findByPrice(String.valueOf(price)));
-    }
-
-    public List<Event> getAllEventsByDate(LocalDate date) {
-        return eventRepository.findByDate(String.valueOf(date));
-    }
-
-    public List<Event> getAllEventsByVenue(String venueId) {
-        return eventRepository.findByVenueId(venueId);
-    }
-
-    public Event findById(String id) {
-        return eventRepository.findById(id).orElse(null);
-    }
-
-    public Event addNewEvent(String name) {
-        return addEvent(new Event(name));
-    }
-
-    public List<Event> getAllEventsByTime(String time) {
-        return eventRepository.findByTime(time);
-    }
-
-    public List<Event> getAllEventsByDateRange(String s, String s1) {
-        return eventRepository.findByDateBetween(LocalDate.parse(s), LocalDate.parse(s1));
-    }
-
-    public List<Event> getAllEventsByCategory(String category) {
-        return eventRepository.findByCategory(category);
-    }
-
-    public List<Event> getAllEventsByPrice(String price) {
-        return eventRepository.findByPrice(price);
-    }
-
-    public List<Event> getAllEventsByDuration(String duration) {
-        return eventRepository.findByDuration(duration);
-    }
-
-    public List<Event> getAllEventsByRating(String rating) {
-        return eventRepository.findByRating(rating);
+    private Event recordToEvent(EventRecord record){
+        return new Event(record.getId(),
+                record.getEventName(),
+                record.getUsername(),
+                record.getDescription(),
+                record.getVenueId(),
+                record.getStartDate(),
+                record.getEndDate(),
+                record.getCategory());
     }
 }
