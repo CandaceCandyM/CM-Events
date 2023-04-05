@@ -4,7 +4,9 @@ import com.kenzie.appserver.controller.model.EventCreateRequest;
 import com.kenzie.appserver.controller.model.EventResponse;
 import com.kenzie.appserver.service.EventService;
 import com.kenzie.appserver.service.model.Event;
-import com.kenzie.appserver.service.model.Guest;
+import com.kenzie.capstone.service.model.Guest;
+import com.kenzie.capstone.service.model.GuestData;
+import com.kenzie.capstone.service.model.GuestRequest;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -86,10 +88,14 @@ public class EventController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/guests")
+    @GetMapping("/guests/{id}")
     public ResponseEntity<List<Guest>> getGuests(@PathVariable("id") String eventId) {
-        eventService.getEventGuests(eventId);
-        return null;
+        return ResponseEntity.ok(eventService.getEventGuests(eventId));
+    }
+
+    @PostMapping("/guests")
+    public ResponseEntity<GuestData> rsvp(@RequestBody GuestRequest request) {
+        return ResponseEntity.ok(eventService.addEventGuest(request));
     }
 
     @GetMapping("/today")

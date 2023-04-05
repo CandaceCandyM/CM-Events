@@ -1,13 +1,20 @@
 package com.kenzie.capstone.service.client;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kenzie.capstone.service.model.ExampleData;
+import com.kenzie.capstone.service.model.Guest;
+import com.kenzie.capstone.service.model.GuestData;
+import com.kenzie.capstone.service.model.GuestRequest;
+
+import java.util.List;
 
 public class LambdaServiceClient {
 
-    private static final String GET_EXAMPLE_ENDPOINT = "example/{id}";
-    private static final String SET_EXAMPLE_ENDPOINT = "example";
-    private static final String GET_VENUE_EVENTS_ENDPOINT = "venue/{id}/events";
+    private static final String GUEST_BY_EVENT_ENDPOINT = "guests/event/{id}";
+    private static final String GUEST_BY_ID_ENDPOINT = "guests/{id}";
+    private static final String GUEST_ENDPOINT = "guests";
 
     private ObjectMapper mapper;
 
@@ -15,40 +22,53 @@ public class LambdaServiceClient {
         this.mapper = new ObjectMapper();
     }
 
-    public ExampleData getExampleData(String id) {
+    public GuestData getGuestData(String id) {
         EndpointUtility endpointUtility = new EndpointUtility();
-        String response = endpointUtility.getEndpoint(GET_EXAMPLE_ENDPOINT.replace("{id}", id));
-        ExampleData exampleData;
+        String response = endpointUtility.getEndpoint(GUEST_BY_ID_ENDPOINT.replace("{id}", id));
+        GuestData guestData;
         try {
-            exampleData = mapper.readValue(response, ExampleData.class);
+            guestData = mapper.readValue(response, GuestData.class);
         } catch (Exception e) {
             throw new ApiGatewayException("Unable to map deserialize JSON: " + e);
         }
-        return exampleData;
+        return guestData;
     }
 
-    public ExampleData setExampleData(String data) {
+    public GuestData setGuestData(GuestRequest guestRequest) {
         EndpointUtility endpointUtility = new EndpointUtility();
-        String response = endpointUtility.postEndpoint(SET_EXAMPLE_ENDPOINT, data);
-        ExampleData exampleData;
+        String request;
         try {
-            exampleData = mapper.readValue(response, ExampleData.class);
+            request = mapper.writeValueAsString(guestRequest);
+        } catch (JsonProcessingException e) {
+            throw new ApiGatewayException("Unable to serialize request: " + e);
+        }
+        String response = endpointUtility.postEndpoint(GUEST_ENDPOINT, request);
+        GuestData guestData;
+        try {
+            guestData = mapper.readValue(response, GuestData.class);
         } catch (Exception e) {
             throw new ApiGatewayException("Unable to map deserialize JSON: " + e);
         }
-        return exampleData;
+        return guestData;
     }
 
-    public String getEvent(String id) {
-        return id;
-    }
-
-    public LambdaServiceClient getVenue(String venueId) {
-        return null;
-    }
-
-    public String getVenueEvents(String id) {
+    public boolean deleteGuestData(String id) {
         EndpointUtility endpointUtility = new EndpointUtility();
-        return endpointUtility.getEndpoint(GET_VENUE_EVENTS_ENDPOINT.replace("{id}", id));
+        String response = endpointUtility.deleteEndpoint(GUEST_BY_ID_ENDPOINT.replace("{id}", id));
+        try {
+            return mapper.readValue(response, Boolean.class);
+        } catch (JsonProcessingException e) {
+            throw new ApiGatewayException("Unable to deserialize response: " + e);
+        }
+    }
+
+    public List<Guest> getGuestDataByEventId(String id) {
+        EndpointUtility endpointUtility = new EndpointUtility();
+        String response = endpointUtility.deleteEndpoint(GUEST_BY_EVENT_ENDPOINT.replace("{id}", id));
+        try {
+            return mapper.readValue(response, new TypeReference<>(){});
+        } catch (JsonProcessingException e) {
+            throw new ApiGatewayException("Unable to deserialize response: " + e);
+        }
     }
 }

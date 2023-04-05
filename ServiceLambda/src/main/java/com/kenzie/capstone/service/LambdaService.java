@@ -1,34 +1,60 @@
 package com.kenzie.capstone.service;
 
-import com.kenzie.capstone.service.model.ExampleData;
-import com.kenzie.capstone.service.dao.ExampleDao;
-import com.kenzie.capstone.service.model.ExampleRecord;
+import com.kenzie.capstone.service.dao.GuestDao;
+import com.kenzie.capstone.service.model.Guest;
+import com.kenzie.capstone.service.model.GuestData;
+import com.kenzie.capstone.service.model.GuestRecord;
+import com.kenzie.capstone.service.model.GuestRequest;
 
 import javax.inject.Inject;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class LambdaService {
 
-    private ExampleDao exampleDao;
+    private GuestDao guestDao;
 
     @Inject
-    public LambdaService(ExampleDao exampleDao) {
-        this.exampleDao = exampleDao;
+    public LambdaService(GuestDao guestDao) {
+        this.guestDao = guestDao;
     }
 
-    public ExampleData getExampleData(String id) {
-        List<ExampleRecord> records = exampleDao.getExampleData(id);
-        if (records.size() > 0) {
-            return new ExampleData(records.get(0).getId(), records.get(0).getData());
-        }
-        return null;
+    public Guest getGuestData(String id) {
+        return recordToGuest(guestDao.getGuestData(id));
     }
 
-    public ExampleData setExampleData(String data) {
-        String id = UUID.randomUUID().toString();
-        ExampleRecord record = exampleDao.setExampleData(id, data);
-        return new ExampleData(id, data);
+    public GuestData setGuestData(GuestRequest request) {
+        GuestData data = requestToData(request);
+        data.setId(UUID.randomUUID().toString());
+        return guestDao.storeGuestData(data);
+    }
+
+    public boolean deleteGuestData(String id) {
+        GuestRecord record = new GuestRecord();
+        record.setId(id);
+        return guestDao.deleteGuestData(record);
+    }
+
+    public List<Guest> getGuestsByEventId(String id) {
+        return guestDao.getGuestsByEventId(id)
+                .stream().map(this::recordToGuest)
+                .collect(Collectors.toList());
+    }
+
+    private GuestData requestToData(GuestRequest request) {
+        GuestData data = new GuestData();
+        data.setName(request.getName());
+        data.setEventId(request.getEventId());
+        return data;
+    }
+
+    private Guest recordToGuest(GuestRecord record) {
+        Guest guest = new Guest();
+        guest.setId(record.getId());
+        guest.setName(record.getName());
+        guest.setEventId(record.getEventId());
+        return guest;
     }
 }

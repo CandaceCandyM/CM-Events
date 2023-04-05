@@ -3,8 +3,10 @@ package com.kenzie.appserver.service;
 import com.kenzie.appserver.repositories.EventRepository;
 import com.kenzie.appserver.repositories.model.EventRecord;
 import com.kenzie.appserver.service.model.Event;
-import com.kenzie.appserver.service.model.Guest;
 import com.kenzie.capstone.service.client.LambdaServiceClient;
+import com.kenzie.capstone.service.model.Guest;
+import com.kenzie.capstone.service.model.GuestData;
+import com.kenzie.capstone.service.model.GuestRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -60,10 +62,12 @@ public class EventService {
         return events;
     }
 
-    public List<Guest> getEventGuests(String id){
-        lambdaServiceClient.getExampleData(id);
-        //Do something here
-        return null;
+    public List<Guest> getEventGuests(String eventId){
+        return lambdaServiceClient.getGuestDataByEventId(eventId);
+    }
+
+    public GuestData addEventGuest(GuestRequest request){
+        return lambdaServiceClient.setGuestData(request);
     }
 
     public List<Event> getEventsToday() {
