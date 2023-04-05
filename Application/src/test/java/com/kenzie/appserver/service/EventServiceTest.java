@@ -162,6 +162,7 @@ public class EventServiceTest {
      * Test to verify that the event service is able to get all events by name
      */
     @Test
+
     //Test 6
     public void getAllEventsByName() {
         // GIVEN
