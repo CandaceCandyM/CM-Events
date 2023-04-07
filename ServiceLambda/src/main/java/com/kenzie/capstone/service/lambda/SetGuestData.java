@@ -11,6 +11,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.kenzie.capstone.service.model.GuestRecord;
 import com.kenzie.capstone.service.model.GuestRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,7 +40,7 @@ public class SetGuestData implements RequestHandler<APIGatewayProxyRequestEvent,
 
         try {
             GuestRequest request = gson.fromJson(input.getBody(), GuestRequest.class);
-            GuestData output = lambdaService.setGuestData(request);
+            GuestRecord output = lambdaService.setGuestData(request);
 
             return response
                     .withStatusCode(200)

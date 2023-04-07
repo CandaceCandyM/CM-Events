@@ -34,7 +34,7 @@ class LambdaServiceTest {
 
     @Test
     void setDataTest() {
-        ArgumentCaptor<GuestData> dataCaptor = ArgumentCaptor.forClass(GuestData.class);
+        ArgumentCaptor<GuestRecord> recordCaptor = ArgumentCaptor.forClass(GuestRecord.class);
 
         // GIVEN
         GuestRequest guestRequest = new GuestRequest();
@@ -42,14 +42,14 @@ class LambdaServiceTest {
         guestRequest.setEventId("123aabb");
 
         // WHEN
-        GuestData response = this.lambdaService.setGuestData(guestRequest);
+        GuestRecord response = this.lambdaService.setGuestData(guestRequest);
 
         // THEN
-        verify(guestDao, times(1)).storeGuestData(dataCaptor.capture());
+        verify(guestDao, times(1)).storeGuestData(recordCaptor.capture());
 
-        GuestData capturedData = dataCaptor.getValue();
+        GuestRecord capturedData = recordCaptor.getValue();
 
-        assertNotNull(capturedData, "An ID is generated");
+        assertNotNull(capturedData.getId(), "An ID is generated");
         assertEquals(guestRequest.getName(), capturedData.getName(), "The data is saved");
     }
 

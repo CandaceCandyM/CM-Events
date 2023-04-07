@@ -37,7 +37,7 @@ public class GetGuestsByEventId implements RequestHandler<APIGatewayProxyRequest
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent()
                 .withHeaders(headers);
 
-        String eventId = input.getPathParameters().get("eventId");
+        String eventId = input.getPathParameters().get("id");
 
         if (eventId == null || eventId.length() == 0) {
             return response

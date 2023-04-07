@@ -25,10 +25,10 @@ public class LambdaService {
         return recordToGuest(guestDao.getGuestData(id));
     }
 
-    public GuestData setGuestData(GuestRequest request) {
-        GuestData data = requestToData(request);
-        data.setId(UUID.randomUUID().toString());
-        return guestDao.storeGuestData(data);
+    public GuestRecord setGuestData(GuestRequest request) {
+        GuestRecord record = requestToRecord(request);
+        record.setId(UUID.randomUUID().toString());
+        return guestDao.storeGuestData(record);
     }
 
     public boolean deleteGuestData(String id) {
@@ -43,11 +43,11 @@ public class LambdaService {
                 .collect(Collectors.toList());
     }
 
-    private GuestData requestToData(GuestRequest request) {
-        GuestData data = new GuestData();
-        data.setName(request.getName());
-        data.setEventId(request.getEventId());
-        return data;
+    private GuestRecord requestToRecord(GuestRequest request) {
+        GuestRecord record = new GuestRecord();
+        record.setName(request.getName());
+        record.setEventId(request.getEventId());
+        return record;
     }
 
     private Guest recordToGuest(GuestRecord record) {

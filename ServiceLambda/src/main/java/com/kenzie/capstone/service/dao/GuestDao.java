@@ -1,14 +1,11 @@
 package com.kenzie.capstone.service.dao;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDeleteExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.kenzie.capstone.service.model.GuestData;
 import com.kenzie.capstone.service.model.Guest;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBSaveExpression;
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 import com.amazonaws.services.dynamodbv2.model.ExpectedAttributeValue;
 import com.google.common.collect.ImmutableMap;
@@ -27,9 +24,9 @@ public class GuestDao {
         this.mapper = mapper;
     }
 
-    public GuestData storeGuestData(GuestData guestData) {
+    public GuestRecord storeGuestData(GuestRecord record) {
         try {
-            mapper.save(guestData, new DynamoDBSaveExpression()
+            mapper.save(record, new DynamoDBSaveExpression()
                     .withExpected(ImmutableMap.of(
                             "id",
                             new ExpectedAttributeValue().withExists(false)
@@ -38,7 +35,7 @@ public class GuestDao {
             throw new IllegalArgumentException("id has already been used");
         }
 
-        return guestData;
+        return record;
     }
 
     public GuestRecord getGuestData(String id) {
@@ -53,11 +50,12 @@ public class GuestDao {
     }
 
     public List<GuestRecord> getGuestsByEventId(String id) {
-        DynamoDBQueryExpression<GuestRecord> queryExpression = new DynamoDBQueryExpression<GuestRecord>()
-                .withExpressionAttributeValues(ImmutableMap.of("eventId", new AttributeValue(id)))
+        DynamoDBScanExpression queryExpression = new DynamoDBScanExpression()
+                .withFilterExpression("eventId = :id")
+                .withExpressionAttributeValues(ImmutableMap.of(":id", new AttributeValue(id)))
                 .withConsistentRead(false);
 
-        return mapper.query(GuestRecord.class, queryExpression);
+        return mapper.scan(GuestRecord.class, queryExpression);
     }
 
     public boolean deleteGuestData(GuestRecord guestRecord) {

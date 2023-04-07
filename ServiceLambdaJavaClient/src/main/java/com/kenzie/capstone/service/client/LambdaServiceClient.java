@@ -64,7 +64,7 @@ public class LambdaServiceClient {
 
     public List<Guest> getGuestDataByEventId(String id) {
         EndpointUtility endpointUtility = new EndpointUtility();
-        String response = endpointUtility.deleteEndpoint(GUEST_BY_EVENT_ENDPOINT.replace("{id}", id));
+        String response = endpointUtility.getEndpoint(GUEST_BY_EVENT_ENDPOINT.replace("{id}", id));
         try {
             return mapper.readValue(response, new TypeReference<>(){});
         } catch (JsonProcessingException e) {
