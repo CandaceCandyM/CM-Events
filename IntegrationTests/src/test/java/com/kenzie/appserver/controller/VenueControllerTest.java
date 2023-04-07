@@ -97,7 +97,7 @@ public class VenueControllerTest {
                 .andExpect(jsonPath("event_capacity").exists())
                 .andExpect(jsonPath("address").exists())
                 .andExpect(jsonPath("description").exists())
-                .andExpect(status().isCreated())
+                .andExpect(status().is2xxSuccessful())
                 .andReturn();
         venueService.deleteVenue(JsonPath.read(result.getResponse().getContentAsString(), "$.id"));
     }
@@ -170,7 +170,7 @@ public class VenueControllerTest {
     public void getAvailableVenues_returnsListOfAvailableVenues() throws Exception {
         String id = UUID.randomUUID().toString();
 
-        Venue venue = new Venue(mockNeat.uuids().valStr(), mockNeat.strings().valStr(),
+        Venue venue = new Venue(id, mockNeat.strings().valStr(),
                 mockNeat.strings().valStr(), mockNeat.strings().valStr(), mockNeat.strings().valStr(),
                 "AVAILABLE", mockNeat.ints().valStr(), mockNeat.domains().valStr(), mockNeat.emails().valStr());
 

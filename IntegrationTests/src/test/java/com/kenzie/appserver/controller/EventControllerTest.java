@@ -63,9 +63,9 @@ public class EventControllerTest {
         mvc.perform(get("/events/{id}", id)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("id").exists())
-                .andExpect(jsonPath("eventName").exists())
+                .andExpect(jsonPath("event_name").exists())
                 .andExpect(jsonPath("username").exists())
-                .andExpect(jsonPath("venueId").exists())
+                .andExpect(jsonPath("venue_id").exists())
                 .andExpect(jsonPath("description").exists())
                 .andExpect(status().isOk());
         eventService.deleteEventById(id);
@@ -96,9 +96,9 @@ public class EventControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(eventCreateRequest)))
                 .andExpect(jsonPath("id").exists())
-                .andExpect(jsonPath("eventName").exists())
+                .andExpect(jsonPath("event_name").exists())
                 .andExpect(jsonPath("username").exists())
-                .andExpect(jsonPath("venueId").exists())
+                .andExpect(jsonPath("venue_id").exists())
                 .andExpect(jsonPath("description").exists())
                 .andExpect(status().isCreated())
                 .andReturn();
@@ -142,9 +142,9 @@ public class EventControllerTest {
 
         eventService.addEvent(event);
 
-        Event updatedEvent = new Event(id, mockNeat.strings().valStr(), mockNeat.strings().valStr(),
+        EventResponse updatedEvent = convertEvent(new Event(id, mockNeat.strings().valStr(), mockNeat.strings().valStr(),
                 mockNeat.strings().valStr(), mockNeat.uuids().valStr(), mockNeat.localDates().valStr(),
-                mockNeat.localDates().valStr(), mockNeat.strings().valStr());
+                mockNeat.localDates().valStr(), mockNeat.strings().valStr()));
 
         ResultActions actions = mvc.perform(post("/events/{id}", id)
                         .content(mapper.writeValueAsString(updatedEvent))
@@ -160,9 +160,9 @@ public class EventControllerTest {
 
     @Test
     public void updateEvent_withInvalidId_returnsNotFoundStatus() throws Exception {
-        Event updatedEvent = new Event(mockNeat.uuids().valStr(), mockNeat.strings().valStr(), mockNeat.strings().valStr(),
-                mockNeat.strings().valStr(), mockNeat.uuids().valStr(), mockNeat.localDates().valStr(),
-                mockNeat.localDates().valStr(), mockNeat.strings().valStr());
+        EventResponse updatedEvent = convertEvent(new Event(mockNeat.uuids().valStr(), mockNeat.strings().valStr(),
+                mockNeat.strings().valStr(), mockNeat.strings().valStr(), mockNeat.uuids().valStr(),
+                mockNeat.localDates().valStr(), mockNeat.localDates().valStr(), mockNeat.strings().valStr()));
 
         mvc.perform(post("/events/{id}", updatedEvent.getId())
                         .content(mapper.writeValueAsString(updatedEvent))
@@ -174,5 +174,18 @@ public class EventControllerTest {
     @Test
     public void getAvailableEvents_returnsListOfAvailableEvents() throws Exception {
 
+    }
+
+    private EventResponse convertEvent(Event event){
+        EventResponse eventResponse = new EventResponse();
+        eventResponse.setId(event.getId());
+        eventResponse.setUsername(event.getUsername());
+        eventResponse.setEventName(event.getEventName());
+        eventResponse.setDescription(event.getDescription());
+        eventResponse.setVenueId(event.getVenueId());
+        eventResponse.setStartDate(event.getStartDate());
+        eventResponse.setEndDate(event.getEndDate());
+        eventResponse.setCategory(event.getCategory());
+        return eventResponse;
     }
 }

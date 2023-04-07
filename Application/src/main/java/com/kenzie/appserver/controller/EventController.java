@@ -11,6 +11,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.webjars.NotFoundException;
 
 import java.net.URI;
 import java.util.List;
@@ -160,6 +161,6 @@ public class EventController {
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    @ExceptionHandler({EmptyResultDataAccessException.class, NoSuchElementException.class})
+    @ExceptionHandler({EmptyResultDataAccessException.class, NoSuchElementException.class, NotFoundException.class})
     public void notFound(){}
 }

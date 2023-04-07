@@ -8,6 +8,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.webjars.NotFoundException;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -113,7 +114,7 @@ public class VenueController {
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    @ExceptionHandler({EmptyResultDataAccessException.class, NoSuchElementException.class})
+    @ExceptionHandler({EmptyResultDataAccessException.class, NoSuchElementException.class, NotFoundException.class})
     public void notFound(){}
 }
 

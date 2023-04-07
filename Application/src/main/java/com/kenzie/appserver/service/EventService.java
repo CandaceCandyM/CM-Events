@@ -40,6 +40,8 @@ public class EventService {
     }
 
     public Event updateEvent(Event event) {
+        if (getEventById(event.getId()) == null)
+            throw new NotFoundException("No event with id: " + event.getId() + "! ");
         eventRepository.save(eventToRecord(event));
         return event;
     }
