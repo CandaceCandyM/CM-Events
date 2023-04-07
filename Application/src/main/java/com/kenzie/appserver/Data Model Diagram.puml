@@ -1,4 +1,4 @@
-@startmep
+@startuml
 'file:///Users/candacem/Documents/Majestic%20Event%20Planning-%20data%20model%20Sequence%20diagram%20(2).pdf
 
 
@@ -25,4 +25,4 @@
 ** Notify with RSVP
 *** Execute Event at Venue
 ** Receive Guest satisfaction
-@endmep
+@enduml
