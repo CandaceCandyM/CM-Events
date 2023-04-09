@@ -127,3 +127,15 @@
      background-color: #000;
      opacity: 0.5;
 }
+
+.results {
+}
+
+.name-result {
+    text-indent: 3%;
+}
+
+.host-result, .category-result, .dates-result, .desc-result, .venue-result, .venue-id-result,
+    .address-result, .status-result, .event-capacity-result, .phone-result, .email-result, .website-result {
+    text-indent: 5%;
+}

@@ -87,6 +87,12 @@ public class VenueController {
                 venueCreateRequest.getEventCapacity());
         if (venueCreateRequest.getStatus() != null)
             venue.setStatus(venueCreateRequest.getStatus());
+        if (venueCreateRequest.getPhone() != null)
+            venue.setPhone(venueCreateRequest.getPhone());
+        if (venueCreateRequest.getEmail() != null)
+            venue.setEmail(venueCreateRequest.getEmail());
+        if (venueCreateRequest.getWebsite() != null)
+            venue.setWebsite(venueCreateRequest.getWebsite());
 
         VenueResponse venueResponse = convertVenue(venueService.createVenue(venue));
 
