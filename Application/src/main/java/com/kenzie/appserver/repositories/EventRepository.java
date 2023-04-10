@@ -14,7 +14,7 @@ public interface EventRepository extends CrudRepository<EventRecord, String> {
      * @return a list of events within the given date range
      */
 
-    List<EventRecord> findByStartDateBeforeAndEndDateAfter(String date, String date2);
+    List<EventRecord> findByStartDateLessThanEqualAndEndDateGreaterThanEqual(String date, String date2);
 
     /**
      * Find events by venue ID.

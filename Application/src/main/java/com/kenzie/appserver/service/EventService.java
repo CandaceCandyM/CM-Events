@@ -73,12 +73,12 @@ public class EventService {
 
     public List<Event> getEventsToday() {
         LocalDate today = LocalDate.now();
-        return eventRepository.findByStartDateBeforeAndEndDateAfter(today.toString(), today.toString())
+        return eventRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqual(today.toString(), today.toString())
                 .stream().map(this::recordToEvent).collect(Collectors.toList());
     }
 
     public List<Event> getEventsByDate(String date) {
-        return eventRepository.findByStartDateBeforeAndEndDateAfter(date, date)
+        return eventRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqual(date, date)
                 .stream().map(this::recordToEvent).collect(Collectors.toList());
     }
 

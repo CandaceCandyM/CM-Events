@@ -77,12 +77,12 @@ public class EventServiceTest {
                 "venue", "2023-03-20", "2023-05-20", "category");
         events.add(event1);
         events.add(event2);
-        when(eventRepository.findByStartDateBeforeAndEndDateAfter("2023-04-20", "2023-04-20"))
+        when(eventRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqual("2023-04-20", "2023-04-20"))
                 .thenReturn(events.stream().map(this::eventToRecord).collect(Collectors.toList()));
         // WHEN
         List<Event> result = eventService.getEventsByDate("2023-04-20");
         // THEN
-        verify(eventRepository).findByStartDateBeforeAndEndDateAfter("2023-04-20", "2023-04-20");
+        verify(eventRepository).findByStartDateLessThanEqualAndEndDateGreaterThanEqual("2023-04-20", "2023-04-20");
         assertThat(result, containsInAnyOrder(event1, event2));
     }
 
