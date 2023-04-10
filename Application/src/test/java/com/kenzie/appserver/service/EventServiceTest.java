@@ -4,19 +4,26 @@ import com.kenzie.appserver.repositories.EventRepository;
 import com.kenzie.appserver.repositories.model.EventRecord;
 import com.kenzie.appserver.service.model.Event;
 import com.kenzie.capstone.service.client.LambdaServiceClient;
+import com.kenzie.capstone.service.model.GuestRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.webjars.NotFoundException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -180,6 +187,133 @@ public class EventServiceTest {
         // THEN
         verify(eventRepository).findByEventNameContaining("name");
         assertThat(result, containsInAnyOrder(event1, event2));
+    }
+
+    @Test
+
+    //Test 7
+    public void getAllEvents() {
+        // GIVEN
+        List<Event> events = new ArrayList<>( );
+        Event event1 = new Event("1", "name", "username", "description",
+                "venue", "2023-03-20", "2023-05-20", "category");
+        Event event2 = new Event("2", "name", "username", "description",
+                "venue", "2023-03-20", "2023-05-20", "category");
+        events.add(event1);
+        events.add(event2);
+        when(eventRepository.findAll())
+                .thenReturn(events.stream().map(this::eventToRecord).collect(Collectors.toList()));
+        // WHEN
+        List<Event> result = eventService.getAllEvents();
+        // THEN
+        verify(eventRepository).findAll();
+        assertThat(result, containsInAnyOrder(event1, event2));
+    }
+
+    @Test
+
+    //Test 8
+    public void getAllEventsToday() {
+        // GIVEN
+        List<Event> events = new ArrayList<>( );
+        Event event1 = new Event("1", "name", "username", "description",
+                "venue", "2023-01-20", "2023-12-20", "category");
+        Event event2 = new Event("2", "name", "username", "description",
+                "venue", "2023-01-20", "2023-12-20", "category");
+        events.add(event1);
+        events.add(event2);
+        when(eventRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqual(any(), any()))
+                .thenReturn(events.stream().map(this::eventToRecord).collect(Collectors.toList()));
+        // WHEN
+        List<Event> result = eventService.getEventsToday();
+        // THEN
+        verify(eventRepository).findByStartDateLessThanEqualAndEndDateGreaterThanEqual(any(), any());
+        assertThat(result, containsInAnyOrder(event1, event2));
+    }
+
+    @Test
+
+    //Test 9
+    public void updateEvent() {
+        // GIVEN
+        Event event1 = new Event("1", "name", "username", "description",
+                "venue", "2023-03-20", "2023-05-20", "category");
+        when(eventRepository.findById("1"))
+                .thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class, () -> eventService.updateEvent(event1));
+        when(eventRepository.findById("1"))
+                .thenReturn(Optional.of(eventToRecord(event1)));
+        when(eventRepository.save(eventToRecord(event1)))
+                .thenReturn(eventToRecord(event1));
+        // WHEN
+        eventService.updateEvent(event1);
+        // THEN
+        verify(eventRepository).save(eventToRecord(event1));
+    }
+
+    @Test
+
+    //Test 10
+    public void addEvent() {
+        // GIVEN
+        Event event1 = new Event("1", "name", "username", "description",
+                "venue", "2023-03-20", "2023-05-20", "category");
+        when(eventRepository.save(eventToRecord(event1)))
+                .thenReturn(eventToRecord(event1));
+        // WHEN
+        eventService.addEvent(event1);
+        // THEN
+        verify(eventRepository).save(eventToRecord(event1));
+    }
+
+    @Test
+
+    //Test 11
+    public void getEventById() {
+        // GIVEN
+        Event event1 = new Event("1", "name", "username", "description",
+                "venue", "2023-03-20", "2023-05-20", "category");
+
+        assertThrows(NullPointerException.class, () -> eventService.getEventById(null));
+        when(eventRepository.findById("1"))
+                .thenReturn(Optional.of(eventToRecord(event1)));
+        // WHEN
+        eventService.getEventById("1");
+        // THEN
+        verify(eventRepository).findById("1");
+    }
+
+    @Test
+
+    //Test 12
+    public void deleteEventById() {
+        // GIVEN
+        // WHEN
+        eventService.deleteEventById("1");
+        // THEN
+        verify(eventRepository).deleteById("1");
+    }
+
+    @Test
+
+    //Test 13
+    public void getEventGuests() {
+        // GIVEN
+        // WHEN
+        eventService.getEventGuests("1");
+        // THEN
+        verify(lambdaServiceClient).getGuestDataByEventId("1");
+    }
+
+    @Test
+
+    //Test 14
+    public void addEventGuest() {
+        // GIVEN
+        // WHEN
+        eventService.addEventGuest(new GuestRequest());
+        // THEN
+        verify(lambdaServiceClient).setGuestData(any());
     }
 
     private EventRecord eventToRecord(Event event){

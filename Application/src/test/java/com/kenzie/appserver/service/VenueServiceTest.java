@@ -97,15 +97,12 @@ public class VenueServiceTest {
 
     // Test 5
     @Test
-    public void ReturnNullWhenUpdatingNonexistentVenue() {
+    public void ReturnNotFoundWhenUpdatingNonexistentVenue() {
         // GIVEN
         when(venueRepository.existsById(venue.getId())).thenReturn(false);
 
-        // WHEN
-        Venue result = venueService.updateVenue(venue);
-
-        // THEN
-        assertNull(result);
+        // WHEN & THEN
+        assertThrows(NotFoundException.class, () -> venueService.updateVenue(venue));
     }
 
     // Test 6

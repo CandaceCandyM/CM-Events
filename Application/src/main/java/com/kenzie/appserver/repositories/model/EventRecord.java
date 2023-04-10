@@ -4,6 +4,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
+import java.util.Objects;
+
 @DynamoDBTable(tableName = "Events")
 public class EventRecord {
 
@@ -94,5 +96,18 @@ public class EventRecord {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EventRecord record = (EventRecord) o;
+        return Objects.equals(id, record.id) && Objects.equals(eventName, record.eventName) && Objects.equals(venueId, record.venueId) && Objects.equals(description, record.description) && Objects.equals(username, record.username) && Objects.equals(startDate, record.startDate) && Objects.equals(endDate, record.endDate) && Objects.equals(category, record.category);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, eventName, venueId, description, username, startDate, endDate, category);
     }
 }
