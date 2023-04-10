@@ -8,12 +8,12 @@
 <body class="background">
     <header class="header" id="header">
         <div class="site-title">
-            <a class="header_home" href="index.html">Example App</a>
+            <a class="header_home" href="index.html"><h1>Majestic Event Planning</h1></a>
         </div>
         <nav>
             <ul>
                 <li>
-                    <a href="index.html">Home</a>
+                    <a href="index.html">RSVP</a>
                 </li>
                 <li>
                     <a href="events.html">Public Events</a>
@@ -21,36 +21,23 @@
                 <li>
                     <a href="venues.html">Venues</a>
                 </li>
-                <li>
-                    <a href="rsvp.html">RSVP</a>
-                </li>
             </ul>
         </nav>
     </header>
     <div class="card">
-        <h2>Create Example</h2>
+        <h2>RSVP</h2>
         <form class="card-content" id="create-form">
             <p class="form-field">
-                <label>Name</label>
-                <input type="text" required class="validated-field" id="create-name-field">
+                <label>Event Id</label>
+                <input type="text" value="Go To RSVP Page" required class="validated-field" id="event-id-field">
             </p>
-            <button type="submit">Create</button>
+            <input type="button" onclick="redirect()">
         </form>
     </div>
-    <div class="card">
-        <h2>Get By ID</h2>
-        <form class="card-content" id="get-by-id-form">
-            <p class="form-field">
-                <label>ID</label>
-                <input type="text" required class="validated-field" id="id-field">
-            </p>
-            <button type="submit">Get</button>
-        </form>
-    </div>
-    <div class="card" id="result">
-        <h2>Result:</h2>
-        <p id="result-info"></p>
-    </div>
-
 </body>
+<script>
+    function redirect() {
+        document.location = '/rsvp.html?id=' + document.getElementById("event-id-field").value;
+    }
+</script>
 </html>

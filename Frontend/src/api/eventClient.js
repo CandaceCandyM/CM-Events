@@ -13,7 +13,9 @@ export default class EventClient extends BaseClass {
 
     constructor(props = {}){
         super();
-        const methodsToBind = ['clientLoaded', 'getEventById', 'getEvents', 'createEvent'];
+        const methodsToBind = ['clientLoaded', 'getEventById', 'getEvents', 'createEvent', 'updateEvent', 'deleteEvent',
+            'getEventsToday', 'getEventsByDate', 'getEventsByEventName', 'getEventsByVenueId', 'getEventsByUsername',
+             'getEventsByCategory', 'getEventsByDescription'];
         this.bindClassMethods(methodsToBind, this);
         this.props = props;
         this.clientLoaded(axios);
@@ -68,6 +70,95 @@ export default class EventClient extends BaseClass {
             return response.data;
         } catch (error) {
             this.handleError("createEvent", error, errorCallback);
+        }
+    }
+
+    async updateEvent(id, event_name, username, venue_id, description, start_date, end_date, category, errorCallback) {
+        try {
+            const response = await this.client.post(`/events/${id}`, {
+                event_name: event_name,
+                username: username,
+                venue_id: venue_id,
+                description: description,
+                start_date: start_date,
+                end_date: end_date,
+                category: category
+            });
+            return response.data;
+        } catch (error) {
+            this.handleError("updateEvent", error, errorCallback);
+        }
+    }
+
+    async deleteEvent(id, errorCallback) {
+        try {
+            const response = await this.client.delete(`/events/${id}`);
+            return response.status;
+        } catch (error) {
+            this.handleError("deleteEvent", error, errorCallback)
+        }
+    }
+
+    async getEventsToday(errorCallback) {
+        try {
+            const response = await this.client.get(`/events/today`);
+            return response.data;
+        } catch (error) {
+            this.handleError("getEventsToday", error, errorCallback)
+        }
+    }
+
+    async getEventsByDate(date, errorCallback) {
+        try {
+            const response = await this.client.get(`/events/date/${date}`);
+            return response.data;
+        } catch (error) {
+            this.handleError("getEventsByDate", error, errorCallback)
+        }
+    }
+
+    async getEventsByVenueId(id, errorCallback) {
+        try {
+            const response = await this.client.get(`/events/venueId/${id}`);
+            return response.data;
+        } catch (error) {
+            this.handleError("getEventsByVenueId", error, errorCallback)
+        }
+    }
+
+    async getEventsByEventName(eventName, errorCallback) {
+        try {
+            const response = await this.client.get(`/events/eventName/${eventName}`);
+            return response.data;
+        } catch (error) {
+            this.handleError("getEventsByEventName", error, errorCallback)
+        }
+    }
+
+    async getEventsByUsername(username, errorCallback) {
+        try {
+            const response = await this.client.get(`/events/username/${username}`);
+            return response.data;
+        } catch (error) {
+            this.handleError("getEventsByUsername", error, errorCallback)
+        }
+    }
+
+    async getEventsByCategory(category, errorCallback) {
+        try {
+            const response = await this.client.get(`/events/category/${category}`);
+            return response.data;
+        } catch (error) {
+            this.handleError("getEventsByCategory", error, errorCallback)
+        }
+    }
+
+    async getEventsByDescription(description, errorCallback) {
+        try {
+            const response = await this.client.get(`/events/description/${description}`);
+            return response.data;
+        } catch (error) {
+            this.handleError("getEventsByDescription", error, errorCallback)
         }
     }
 

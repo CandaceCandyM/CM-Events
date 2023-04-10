@@ -103,13 +103,13 @@
     z-index: 9;
 }
 
-.create-form {
+.create-form, .update-form, .delete-form {
     max-width: 70%;
     padding: 10px;
     background-color: white;
 }
 
-.create-form input, .create-form textarea {
+.create-form input, .create-form textarea, .update-form input, .update-form textarea, .delete-form input {
     width: 95%;
     padding: 10px;
     margin: 10px 0px 20px 0;
@@ -131,11 +131,20 @@
 .results {
 }
 
+.search-bar {
+    padding: 10px;
+}
+
+.search-bar input {
+    margin: 20px 0 10px 0;
+}
+
 .name-result {
     text-indent: 3%;
 }
 
 .host-result, .category-result, .dates-result, .desc-result, .venue-result, .venue-id-result,
-    .address-result, .status-result, .event-capacity-result, .phone-result, .email-result, .website-result {
+    .address-result, .status-result, .event-capacity-result, .phone-result, .email-result, .website-result,
+     .id-result {
     text-indent: 5%;
 }

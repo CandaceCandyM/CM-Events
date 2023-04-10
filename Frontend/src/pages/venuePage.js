@@ -6,7 +6,8 @@ class VenuePage extends BaseClass {
 
     constructor() {
         super();
-        this.bindClassMethods(['createVenue', 'renderVenue', 'renderVenues'], this);
+        this.bindClassMethods(['createVenue', 'renderVenue', 'renderVenues', 'updateVenue', 'autofill',
+            'deleteVenue'], this);
         this.dataStore = new DataStore();
     }
 
@@ -15,6 +16,10 @@ class VenuePage extends BaseClass {
      */
     async mount() {
         document.getElementById('new-venue-form').addEventListener('submit', this.createVenue);
+        document.getElementById('update-venue-form').addEventListener('submit', this.updateVenue);
+        document.getElementById('delete-venue-form').addEventListener('submit', this.deleteVenue);
+        document.getElementById('onlyAvailable').addEventListener('change', this.renderVenues);
+        document.getElementById('autofill').addEventListener('click', this.autofill);
         this.client = new VenueClient();
 
         this.renderVenues();
@@ -40,32 +45,37 @@ class VenuePage extends BaseClass {
     async renderVenues() {
         let resultArea = document.getElementById("venue-list");
 
-        const venues = await this.client.getAllVenues(this.errorHandler);
+        let venues = null;
+        if (document.getElementById("onlyAvailable").checked == true) {
+            venues = await this.client.getAllAvailableVenues(this.errorHandler);
+        } else {
+            venues = await this.client.getAllVenues(this.errorHandler);
+        }
         resultArea.innerHTML = "";
         if (venues) {
             for(const venue of venues){
                 resultArea.innerHTML += `
                     <div class="venue-results">
                     <h2><p class="name-result">${venue.name}</p></h2>
-                    <p class="venue-id-result">${venue.id}</p>
+                    <p class="venue-id-result">Id: ${venue.id}</p>
                     <p class="desc-result">${venue.description}</p>
                     <p class="address-result">${venue.address}</p>
-                    <p class="status-result">${venue.status}</p>
-                    <p class="event-capacity-result">${venue.event_capacity}</p>
+                    <p class="status-result">Status: ${venue.status}</p>
+                    <p class="event-capacity-result">Event Capacity: ${venue.event_capacity}</p>
                     `
                 if (venue.phone) {
                     resultArea.innerHTML += `
-                        <p class="phone-result">${venue.phone}</p>
+                        <p class="phone-result">Phone: ${venue.phone}</p>
                         `
                 }
                 if (venue.website) {
                     resultArea.innerHTML += `
-                        <p class="website-result"><a href="${venue.website}">${venue.website}</a></p>
+                        <p class="website-result">Website: <a href="${venue.website}">${venue.website}</a></p>
                         `
                 }
                 if (venue.email) {
                     resultArea.innerHTML += `
-                        <p class="email-result">${venue.email}</p>
+                        <p class="email-result">Email: ${venue.email}</p>
                         `
                 }
                 resultArea.innerHTML += `</div>`
@@ -95,11 +105,83 @@ class VenuePage extends BaseClass {
         this.dataStore.set("venue", createdVenue);
 
         if (createdVenue) {
-            this.showMessage(`${createdVenue.venue_name} has been Created!`);
+            this.showMessage(`${createdVenue.name} has been Created!`);
         } else {
             this.errorHandler("Error Creating Venue! Try again...");
         }
         this.renderVenues();
+    }
+
+     async updateVenue(event) {
+        event.preventDefault();
+        this.dataStore.set("venue", null);
+
+        let id = document.getElementById("update-id-field").value;
+        let venue_name = document.getElementById("update-venue-name-field").value;
+        let description = document.getElementById("update-description-field").value;
+        let address = document.getElementById("update-address-field").value;
+        let status = document.getElementById("update-status-field").value;
+        let event_capacity = document.getElementById("update-event-capacity-field").value;
+        let phone = document.getElementById("update-phone-field").value;
+        let website = document.getElementById("update-website-field").value;
+        let email = document.getElementById("update-email-field").value;
+
+        const updatedVenue = await this.client.updateVenue(id, venue_name, description, address, status,
+            event_capacity, phone, website, email, this.errorHandler);
+        this.dataStore.set("venue", updatedVenue);
+
+        if (updatedVenue) {
+            this.showMessage(`${updatedVenue.name} has been Updated!`);
+        } else {
+            this.errorHandler("Error Updating Venue! Try again...");
+        }
+        this.renderVenues();
+    }
+
+    async deleteVenue(event) {
+        event.preventDefault();
+        this.dataStore.set("venue", null);
+
+        let id = document.getElementById("delete-id-field").value;
+
+        const result = await this.client.deleteVenue(id, this.errorHandler);
+        this.dataStore.set("venue", result);
+
+        if (result) {
+            this.showMessage(`${result.name} has been Deleted!`);
+        } else {
+            this.errorHandler("Error Deleting Venue...");
+        }
+        this.renderVenues();
+    }
+
+    async autofill(event){
+        event.preventDefault();
+        document.getElementById("autofillStatus").innerHTML = "Loading...";
+        const venue = await this.client.getVenueById(document.getElementById("update-id-field").value, this.errorHandler);
+
+        document.getElementById("update-venue-name-field").value = venue.name;
+        document.getElementById("update-description-field").value = venue.description;
+        document.getElementById("update-address-field").value = venue.address;
+        document.getElementById("update-status-field").value = venue.status;
+        document.getElementById("update-event-capacity-field").value = venue.event_capacity;
+        if (venue.phone) {
+            document.getElementById("update-phone-field").value = venue.phone;
+        } else {
+            document.getElementById("update-phone-field").value = "";
+        }
+        if (venue.website) {
+            document.getElementById("update-website-field").value = venue.website;
+        } else {
+            document.getElementById("update-website-field").value = "";
+        }
+        if (venue.email) {
+            document.getElementById("update-email-field").value = venue.email;
+        } else {
+            document.getElementById("update-email-field").value = "";
+        }
+
+        document.getElementById("autofillStatus").innerHTML = "";
     }
 }
 
